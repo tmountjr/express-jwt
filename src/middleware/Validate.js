@@ -3,7 +3,7 @@ const { KJUR, KEYUTIL } = require('jsrsasign')
 const fromBase64Url = (str) => Buffer.from(str, 'base64url').toString()
 
 const validate = function(req, res, next) {
-  const { token, ...other } = req.body
+  const token = req.headers['authorization'].replace('Bearer ', '')
   const [ header, payload ] = token.split('.')
   const { alg } = JSON.parse(fromBase64Url(header))
 
