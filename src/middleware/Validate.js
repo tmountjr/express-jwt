@@ -1,6 +1,11 @@
 const { KJUR, KEYUTIL } = require('jsrsasign')
+const { readFile } = require('jsrsasign-util')
+const path = require('path')
 
 const fromBase64Url = (str) => Buffer.from(str, 'base64url').toString()
+
+const jwtSecret = process.env.JWT_SECRET
+const publicKey = KEYUTIL.getKey(readFile(path.join(__dirname, '..', '..', 'certs', 'pubkey.pem')).replace(/[\n\r]+/g, ''))
 
 const validate = function(req, res, next) {
   const token = req.headers['authorization'].replace('Bearer ', '')
@@ -12,9 +17,9 @@ const validate = function(req, res, next) {
 
   try {
     if (/^HS/.test(alg)) {
-      validationComponent = process.env.JWT_SECRET
+      validationComponent = jwtSecret
     } else if (/^[REP]S/.test(alg)) {
-      validationComponent = KEYUTIL.getKey(other.pubKey)
+      validationComponent = publicKey
     } else {
       console.log(`Invalid algorithm specified: ${alg}`)
       res.status(501).send('Not Implemented')
