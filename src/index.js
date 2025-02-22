@@ -3,6 +3,7 @@ const path = require('path')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const validate = require('./middleware/Validate.js')
+const injectJwks = require('./middleware/InjectJwks.js')
 
 // JWKS handling
 const { JWKS } = require('./JWKS.js')
@@ -26,7 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(cors())
 app.use(bodyParser.json())
 
-app.post('/api/validate', validate, (req, res) => {
+app.post('/api/validate', injectJwks(store), validate, (req, res) => {
   res.json(req.payload)
 })
 
